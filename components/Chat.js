@@ -3,8 +3,11 @@ import { StyleSheet, View, Platform, KeyboardAvoidingView} from "react-native";
 import { GiftedChat, Bubble, InputToolbar} from "react-native-gifted-chat";
 import { addDoc, collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomActions from './CustomActions';
+import MapView from "react-native-maps";
 
-const Chat = ({db, route, navigation, isConnected}) => {
+//create chat component
+const Chat = ({db, route, navigation, isConnected, storage}) => {
     const [messages, setMessages] = useState([]);
     const {name, background, userID} = route.params;
     const onSend = (newMessages) => {
@@ -22,7 +25,6 @@ const Chat = ({db, route, navigation, isConnected}) => {
     useEffect(() => {
         if (isConnected === true) {
             if(unsubMessages) unsubMessages();
-            //unsubMessages = null;
         const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
         const unsubMessages = onSnapshot(q, (documentSnapshot) => {
           let newMessages = [];
@@ -42,12 +44,13 @@ const Chat = ({db, route, navigation, isConnected}) => {
         }
 }, [isConnected]);
 
+//load chached messages
 const loadCachedMessages = async () => {
     const cachedMessages = (await AsyncStorage.getItem("messages")) || [];
     setMessages(JSON.parse(cachedMessages));
 };
 
-
+//create cached messages
 const cacheMessages = async (messagesToCache) => {
     try{
         await AsyncStorage.setItem("messages", JSON.stringify(messagesToCache));
@@ -56,6 +59,7 @@ const cacheMessages = async (messagesToCache) => {
     }
 };
 
+    //customize sent and recieved bubbles
     const renderBubble = (props) => {
         return <Bubble
         {...props}
@@ -70,10 +74,38 @@ const cacheMessages = async (messagesToCache) => {
         />
     }
 
+    //create toolbar
     const renderInputToolbar = (props) => {
         if (isConnected) return <InputToolbar {...props} />;
         else return null;
     };
+
+    //create customActions
+    const renderCustomActions = (props) => {
+        return <CustomActions storage={storage} {...props} userID={userID}/>;
+    }
+
+    //create customView for location
+    const renderCustomView = (props) => {
+        const {currentMessage} = props;
+        if (currentMessage.location) {
+            return (
+                <MapView
+                style={{width: 150,
+                    height: 100,
+                    borderRadius: 13,
+                    margin: 3}}
+                region={{
+                    latitude: currentMessage.location.latitude,
+                    longitude: currentMessage.location.longitude,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                }}
+                />
+            );
+        }
+        return null;
+    }
 
     return(
         <View style={[styles.container, { backgroundColor: background}]}>
@@ -82,6 +114,8 @@ const cacheMessages = async (messagesToCache) => {
         renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
         onSend={messages => onSend(messages)}
+        renderActions={renderCustomActions}
+        renderCustomView={renderCustomView}
         user={{
             _id: userID,
             name: name
