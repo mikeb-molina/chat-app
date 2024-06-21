@@ -52,4 +52,12 @@ Page 2
 - The chat interface and functionality must be created using the Gifted Chat library.
 - The app’s codebase must contain comments.
 
+# Installation
+- Clone this repository
+- Install Node.js (It's recommended to use version 16.19.0 to avoid issues down the line)
+- Install Expo globally using "-g expo-cli"
+- Install dependencies listed above
+- Navigate to the desired project folder and use "npx create-expo-app hello-world --template" to create your project (sub "hello world" for your project name).It's recommended to start with a Blank template for a clean canvas to work from
+- use "npx expo start" to start your development server and check it with the Expo Go
+- set up Firebase - follow prompt to create a new Firestore Database, make sure to set all rules to "allow read, write: if true;" remember to install Firebase using npm and follow Firebase documentation to initialise Firebase in your project file
 
