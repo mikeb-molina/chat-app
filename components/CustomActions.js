@@ -43,14 +43,7 @@ const CustomActions = ({wrapperStyle, iconTextStyle, onSend, storage, userID}) =
         });
       }
 
-      //create unique id for each saved photo
-    const generateReference = (uri) => {
-        const timeStamp = (new Date()).getTime();
-        const imageName= uri.split("/")[uri.split("/").length - 1];
-        return `${userID}-${timeStamp}-${imageName}`;
-    }
-
-    //upload image from device library
+      //upload image from device library
     const pickImage = async () => {
         let permissions = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (permissions?.granted) {
@@ -69,6 +62,17 @@ const CustomActions = ({wrapperStyle, iconTextStyle, onSend, storage, userID}) =
           else Alert.alert("Permissions haven't been granted.");
         }
       }
+
+      //create unique id for each saved photo
+    const generateReference = (uri) => {
+        const timeStamp = (new Date()).getTime();
+        const imageName= uri.split("/")[uri.split("/").length - 1];
+        return `${userID}-${timeStamp}-${imageName}`;
+    }
+
+    
+
+      
 
     //send device location
     const getLocation = async () => {
